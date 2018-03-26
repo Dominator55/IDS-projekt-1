@@ -76,10 +76,13 @@ Vaším úkolem je navrhnout webovou aplikaci pro rezervaci letenek. Systém mus
 [SQL Developer User's Guide](https://docs.oracle.com/database/121/RPTUG/intro.htm#RPTUG10000)
 
 
+
 **Videa/Tutorials**
 
 [Learning PL/SQL programming](https://www.youtube.com/watch?v=xofpqdU3cD4)
+
 [PL/SQL Oracle tutorial, Oracle introduction, PL/SQL basics](https://www.youtube.com/watch?v=9RlxvHMg9PI)
+
 
 **...**
 
