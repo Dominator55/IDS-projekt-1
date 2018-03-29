@@ -31,6 +31,8 @@ DROP TABLE seat CASCADE CONSTRAINTS;
 DROP TABLE flight CASCADE CONSTRAINTS;
 DROP TABLE plane CASCADE CONSTRAINTS;
 DROP TABLE airlane CASCADE CONSTRAINTS;
+DROP TABLE search CASCADE CONSTRAINTS;
+DROP TABLE flight_realised CASCADE CONSTRAINTS;
 
 
 CREATE TABLE customer (
@@ -80,10 +82,27 @@ CREATE TABLE flight (
     destination_airport VARCHAR(100) NOT NULL,
     time_of_departure TIMESTAMP NOT NULL,
     arrival_time TIMESTAMP NOT NULL,
-    searched_by NUMBER,
     plane NUMBER,
     CONSTRAINT fk_airplane FOREIGN KEY (plane) REFERENCES plane (plane_id)
 );
+
+CREATE TABLE search (
+    search_id NUMBER NOT NULL PRIMARY KEY,
+    searched_by NUMBER,
+    CONSTRAINT fk_searched_by FOREIGN KEY (searched_by) REFERENCES customer (customer_id),
+    flight_searched NUMBER,
+    CONSTRAINT fk_flight_searched FOREIGN KEY (flight_searched) REFERENCES flight (flight_id)
+);
+
+CREATE TABLE flight_realised (
+    realisation_id NUMBER NOT NULL PRIMARY KEY,
+    realised_by NUMBER,
+    CONSTRAINT fk_realised_by FOREIGN KEY (realised_by) REFERENCES airlane (airlane_id),
+    realised_flight NUMBER,
+    CONSTRAINT fk_realised_flight FOREIGN KEY (realised_flight) REFERENCES flight (flight_id)
+);
+
+
 
 CREATE TABLE ticket (
     ticket_id NUMBER NOT NULL PRIMARY KEY,
