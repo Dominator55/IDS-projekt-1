@@ -26,11 +26,11 @@
 /*Delete tables*/
 DROP TABLE customer CASCADE CONSTRAINTS;
 DROP TABLE reservation CASCADE CONSTRAINTS;
-DROP TABLE ticket CASCADE CONSTRAINTS;
-DROP TABLE seat CASCADE CONSTRAINTS;
+DROP TABLE flight_ticket CASCADE CONSTRAINTS;
+DROP TABLE flight_seat CASCADE CONSTRAINTS;
 DROP TABLE flight CASCADE CONSTRAINTS;
-DROP TABLE plane CASCADE CONSTRAINTS;
-DROP TABLE airlane CASCADE CONSTRAINTS;
+DROP TABLE airplane CASCADE CONSTRAINTS;
+DROP TABLE airline CASCADE CONSTRAINTS;
 DROP TABLE search CASCADE CONSTRAINTS;
 DROP TABLE flight_realised CASCADE CONSTRAINTS;
 
@@ -40,50 +40,53 @@ CREATE TABLE customer (
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     email_adress VARCHAR(100) NOT NULL,
-    adress_streeet VARCHAR(100) NOT NULL,
-    adress_town VARCHAR(100) NOT NULL,
-    adress_post_code NUMBER NOT NULL,
-    adress_state VARCHAR(100) NOT NULL
+    address_street VARCHAR(100) NOT NULL,
+    address_town VARCHAR(100) NOT NULL,
+    address_post_code NUMBER NOT NULL,
+    address_state VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE reservation (
 -- rodne cislo ten regex som skopiroval z nejakeho stareho projektu
     reservation_id NUMBER PRIMARY KEY CHECK(REGEXP_LIKE(reservation_id,'[0-9][0-9](0|1|2|3|5|6|7|8)[0-9][0-3][0-9][0-9]{3,4}')),
     total_cost NUMBER NOT NULL,
-    state NUMBER NOT NULL,
-	date_of_creation TIMESTAMP NOT NULL,
+    payment_status NUMBER NOT NULL,
+	creation_date TIMESTAMP NOT NULL,
     creator NUMBER,
     CONSTRAINT fk_creator FOREIGN KEY (creator) REFERENCES customer (customer_id)
 );
 
 
-CREATE TABLE airlane (
-    airlane_id NUMBER NOT NULL PRIMARY KEY,
+CREATE TABLE airline (
+    --TODO: airline_code instead of id ; https://gist.github.com/yectep/4372d1166a192d5e9754
+    airline_id NUMBER NOT NULL PRIMARY KEY,
     nationality VARCHAR(100) NOT NULL,
     name VARCHAR(100) NOT NULL,
     hub_airport VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE plane (
-    plane_id NUMBER NOT NULL PRIMARY KEY,
+CREATE TABLE airplane (
+    airplane_id NUMBER NOT NULL PRIMARY KEY,
     production_year NUMBER CHECK(REGEXP_LIKE(production_year,'[0-9][0-9][0-9][0-9]')),
     producer VARCHAR(100),
     model VARCHAR(100),
     seats_1class NUMBER NOT NULL,
     seats_2class NUMBER NOT NULL,
     seats_3class NUMBER NOT NULL,
-    owned_by NUMBER,
-    CONSTRAINT fk_owned_by FOREIGN KEY (owned_by) REFERENCES airlane (airlane_id)    
+    airline NUMBER, --TODO:add better naming, can't be owner -> reserved keyword
+    CONSTRAINT fk_airline FOREIGN KEY (airline) REFERENCES airline (airline_id)    
 );
 
 CREATE TABLE flight (
+    -- TODO: flight code instead of ID, https://academe.co.uk/2014/01/validating-flight-codes/
+    -- Aviation regex toolkit https://gist.github.com/yectep/4372d1166a192d5e9754
     flight_id NUMBER NOT NULL PRIMARY KEY,
-    start_airport VARCHAR(100) NOT NULL,
+    origin_airport VARCHAR(100) NOT NULL,
     destination_airport VARCHAR(100) NOT NULL,
-    time_of_departure TIMESTAMP NOT NULL,
+    departure_time TIMESTAMP NOT NULL,
     arrival_time TIMESTAMP NOT NULL,
-    plane NUMBER,
-    CONSTRAINT fk_airplane FOREIGN KEY (plane) REFERENCES plane (plane_id)
+    airplane NUMBER,
+    CONSTRAINT fk_airplane FOREIGN KEY (airplane) REFERENCES airplane (airplane_id)
 );
 
 CREATE TABLE search (
@@ -97,11 +100,10 @@ CREATE TABLE search (
 CREATE TABLE flight_realised (
     realisation_id NUMBER NOT NULL PRIMARY KEY,
     realised_by NUMBER,
-    CONSTRAINT fk_realised_by FOREIGN KEY (realised_by) REFERENCES airlane (airlane_id),
+    CONSTRAINT fk_realised_by FOREIGN KEY (realised_by) REFERENCES airline (airline_id),
     realised_flight NUMBER,
     CONSTRAINT fk_realised_flight FOREIGN KEY (realised_flight) REFERENCES flight (flight_id)
 );
-
 
 
 CREATE TABLE ticket (
@@ -109,7 +111,7 @@ CREATE TABLE ticket (
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
 	cost NUMBER NOT NULL,
-    checked_in NUMBER CHECK(REGEXP_LIKE(checked_in,'[0-1]')),
+    check_in_status NUMBER CHECK(REGEXP_LIKE(checked_in,'[0-1]')),
     reserved_by NUMBER,
     CONSTRAINT fk_reserved_by FOREIGN KEY (reserved_by) REFERENCES reservation (reservation_id)
 );
@@ -123,7 +125,7 @@ CREATE TABLE seat (
     at_flight NUMBER NOT NULL,
     CONSTRAINT fk_at_flight FOREIGN KEY (at_flight) REFERENCES flight (flight_id),
     offered_by NUMBER NOT NULL,
-    CONSTRAINT fk_offered_by FOREIGN KEY (offered_by) REFERENCES airlane (airlane_id)
+    CONSTRAINT fk_offered_by FOREIGN KEY (offered_by) REFERENCES airline (airline_id)
 );
 -- =================================================================
 -- [ ] [3/5] SQL skript s několika dotazy SELECT
