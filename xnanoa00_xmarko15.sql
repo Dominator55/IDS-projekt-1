@@ -116,7 +116,7 @@ CREATE TABLE customers (
 CREATE TABLE reservations (
   id              NUMBER PRIMARY KEY,
   total_cost      NUMBER,
-  payment_status  NUMBER NOT NULL CHECK(REGEXP_LIKE(payment_status,'[0-1]')), -- true or false
+  payment_status  NUMBER NOT NULL CHECK(payment_status = 0 or payment_status = 1), -- true or false
   created_at      TIMESTAMP NOT NULL,
   created_by      NUMBER,
 
