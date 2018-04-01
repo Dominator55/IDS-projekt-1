@@ -65,7 +65,8 @@
   DROP TABLE passengers       CASCADE CONSTRAINTS;
   DROP TABLE search_records   CASCADE CONSTRAINTS;
 
-
+  DROP SEQUENCE airplane_seq;
+  CREATE SEQUENCE airplane_seq START WITH 1 INCREMENT BY 1 NOCYCLE;
 /* CREATE ALL TABLES */
 
   /* AVIATION MODEL */
@@ -175,6 +176,16 @@
     CONSTRAINT searched_for_flight_fk   FOREIGN KEY (flight)    REFERENCES flights(flight_number)
   );
 
+  CREATE OR REPLACE TRIGGER airplane_trig BEFORE
+    INSERT ON airplanes
+    FOR EACH ROW
+    BEGIN
+        SELECT airplane_seq.NEXTVAL
+        INTO : NEW.id
+        FROM dual;
+  END;
+  /
+  
 /* ---------------------
   INSERT SAMPLE DATA 
 ---------------------- */
