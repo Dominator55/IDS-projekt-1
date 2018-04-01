@@ -75,6 +75,9 @@
   DROP SEQUENCE search_record_seq;
   CREATE SEQUENCE search_record_seq START WITH 1 INCREMENT BY 1 NOCYCLE;
 
+  DROP SEQUENCE customer_seq;
+  CREATE SEQUENCE customer_seq START WITH 1 INCREMENT BY 1 NOCYCLE;
+
 
 /* CREATE ALL TABLES */
 
@@ -207,6 +210,15 @@
     FOR EACH ROW
     BEGIN
         SELECT search_record_seq.NEXTVAL
+        INTO : NEW.id
+        FROM dual;
+    END;
+
+    CREATE OR REPLACE TRIGGER customer_trig BEFORE
+    INSERT ON customers
+    FOR EACH ROW
+    BEGIN
+        SELECT customer_seq.NEXTVAL
         INTO : NEW.id
         FROM dual;
     END;
