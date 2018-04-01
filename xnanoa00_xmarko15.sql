@@ -65,8 +65,17 @@
   DROP TABLE passengers       CASCADE CONSTRAINTS;
   DROP TABLE search_records   CASCADE CONSTRAINTS;
 
+
   DROP SEQUENCE airplane_seq;
   CREATE SEQUENCE airplane_seq START WITH 1 INCREMENT BY 1 NOCYCLE;
+
+  DROP SEQUENCE reservation_seq;
+  CREATE SEQUENCE reservation_seq START WITH 1 INCREMENT BY 1 NOCYCLE;
+
+  DROP SEQUENCE search_record_seq;
+  CREATE SEQUENCE search_record_seq START WITH 1 INCREMENT BY 1 NOCYCLE;
+
+
 /* CREATE ALL TABLES */
 
   /* AVIATION MODEL */
@@ -107,16 +116,16 @@
 
   CREATE TABLE flights (
     /* Flight Number in IATA official format; Example: BA026 */
-    flight_number     NUMBER NOT NULL PRIMARY KEY CHECK(REGEXP_LIKE(flight_number, '[A-Z0-9]{3,}')),
+    flight_number     VARCHAR(6) NOT NULL PRIMARY KEY CHECK(REGEXP_LIKE(flight_number, '[a-zA-Z]{2}[0-9]{4}')),
     departure_time    TIMESTAMP WITH TIME ZONE NOT NULL,
     arrival_time      TIMESTAMP WITH TIME ZONE NOT NULL,
     airplane          NUMBER,
     airline           VARCHAR(2) NOT NULL,
     origin            VARCHAR(3) NOT NULL,
     destination       VARCHAR(3) NOT NULL,
-    --fclass_seats_free NUMBER,
-    --bclass_seats_free NUMBER,
-    --eclass_seats_free NUMBER,
+    fclass_seats_free NUMBER,
+    bclass_seats_free NUMBER,
+    eclass_seats_free NUMBER,
 
     CONSTRAINT flight_with_airplane_fk        FOREIGN KEY (airplane)    REFERENCES airplanes(id),
     CONSTRAINT flight_operated_by_airline_fk  FOREIGN KEY (airline)     REFERENCES airlines(airline_code),
@@ -136,8 +145,7 @@
   );
 
   CREATE TABLE reservations (
-    id              NUMBER PRIMARY KEY,
-    total_cost      NUMBER,
+    id              NUMBER NOT NULL PRIMARY KEY,
     payment_status  NUMBER NOT NULL CHECK(payment_status = 0 or payment_status = 1), -- true or false
     created_at      TIMESTAMP NOT NULL,
     created_by      NUMBER,
@@ -154,13 +162,13 @@
 
   CREATE TABLE tickets (
     /* Flight Ticket number ; Example : 160-4837291830 */
-    ticket_number   VARCHAR(10) NOT NULL PRIMARY KEY CHECK(REGEXP_LIKE(ticket_number, '[0-9]{3}(-)?[0-9]{10}')),
+    ticket_number   VARCHAR(14) NOT NULL PRIMARY KEY CHECK(REGEXP_LIKE(ticket_number, '[0-9]{3}(-)?[0-9]{10}')),
     cost            NUMBER NOT NULL,
     reservation     NUMBER NOT NULL,
     passenger       NUMBER NOT NULL,
-    flight          NUMBER NOT NULL,
+    flight          VARCHAR(6) NOT NULL,
     seat_number     VARCHAR(3) CHECK(REGEXP_LIKE(seat_number, '[0-9][0-9][A-K]')),
-    seat_class      VARCHAR(1) CHECK(REGEXP_LIKE(seat_class, 'F|B|E')),
+    seat_class      VARCHAR(1) CHECK(REGEXP_LIKE(seat_class, '(F|B|E)')),
 
     CONSTRAINT ticket_in_reservation_fk   FOREIGN KEY (reservation) REFERENCES reservations(id),
     CONSTRAINT ticket_for_passenger_fk    FOREIGN KEY (passenger)   REFERENCES passengers(id),
@@ -170,7 +178,7 @@
   CREATE TABLE search_records (
     id        NUMBER NOT NULL PRIMARY KEY,
     customer  NUMBER NOT NULL,
-    flight    NUMBER NOT NULL,
+    flight    VARCHAR(6) NOT NULL,
 
     CONSTRAINT searched_by_customer_fk  FOREIGN KEY (customer)  REFERENCES customers(id),
     CONSTRAINT searched_for_flight_fk   FOREIGN KEY (flight)    REFERENCES flights(flight_number)
@@ -183,8 +191,25 @@
         SELECT airplane_seq.NEXTVAL
         INTO : NEW.id
         FROM dual;
-  END;
-  /
+    END;
+  
+  CREATE OR REPLACE TRIGGER reservation_trig BEFORE
+    INSERT ON reservations
+    FOR EACH ROW
+    BEGIN
+        SELECT reservation_seq.NEXTVAL
+        INTO : NEW.id
+        FROM dual;
+    END;
+
+    CREATE OR REPLACE TRIGGER search_record_trig BEFORE
+    INSERT ON search_records
+    FOR EACH ROW
+    BEGIN
+        SELECT search_record_seq.NEXTVAL
+        INTO : NEW.id
+        FROM dual;
+    END;
   
 /* ---------------------
   INSERT SAMPLE DATA 
@@ -208,6 +233,10 @@ VALUES ('DXB', 'Dubai', 'United Arab Emirates');
 INSERT INTO airports (airport_code, city, country)
 VALUES ('DFW', 'Dallas', 'USA');
 
+INSERT INTO airports (airport_code, city, country)
+VALUES ('TXL', 'Berlin', 'Germany');
+
+
 -- info from wikipedia ; list of airlines
 INSERT INTO airlines (airline_code, full_name, nationality, hub)
 VALUES ('AA', 'American Airlines', 'USA', 'DFW');
@@ -226,6 +255,7 @@ VALUES ('TK', 'Turkish Airlines', 'Turkey', 'IST');
 
 INSERT INTO airlines (airline_code, full_name, nationality, hub)
 VALUES ('EK', 'Emirates', 'United Arab Emirates', 'DXB');
+
 
 -- info from: https://seatguru.com/
 -- TODO: pridat autoincrement na ID alebo pridat priamo ID 
@@ -253,14 +283,18 @@ VALUES ('Boeing', '747-400', '14', '86', '145', 'BA');
 INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
 VALUES ('Airbus', 'A330-200', '0', '22', '228', 'TK');
 
+INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
+VALUES ('Airbus', 'A319', '0', '12', '100', 'BA');
+
+INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
+VALUES ('Airbus', 'A330-300', '8', '42', '145', 'LH');
 
 
--- TODO: pridat rodne cisla
 INSERT INTO passengers (id, first_name, last_name)
-VALUES ('<rodnecislo>', 'Andrej', 'Nano');
+VALUES (9802261040, 'Andrej', 'Nano');
 
 INSERT INTO passengers (id, first_name, last_name)
-VALUES ('<rodnecislo>', 'Peter', 'Marko');
+VALUES (9812345678, 'Peter', 'Marko');
 
 INSERT INTO passengers (id, first_name, last_name)
 VALUES (9905291235, 'Meno', 'Priezvisko');
@@ -307,6 +341,46 @@ INSERT INTO customers (first_name, last_name, email, addr_street, addr_town, add
 VALUES ('Teódor', 'Ladislav', 'teodorL@gmail.com', '4 S. Chalupku', 'Prievidza', '97101', 'Slovakia');
 
 
+-- insert flights
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination, fclass_seats_free, bclass_seats_free, eclass_seats_free)
+VALUES ('BA0304', '2018-04-20 07:20:00.00 +00:00', '2018-04-20 09:35:00.00 +01:00', '9', 'BA', 'LHR', 'CDG');
+
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination, fclass_seats_free, bclass_seats_free, eclass_seats_free)
+VALUES ('EK123', '2018-04-14 11:20:00.00 +04:00', '2018-04-14 14:55:00.00 +03:00', '1', 'EK', 'DXB', 'IST');
+
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination, fclass_seats_free, bclass_seats_free, eclass_seats_free)
+VALUES ('LH172', '2018-04-20 06:15:00.00 +01:00', '2018-04-20 07:55:00.00 +01:00', '10', 'LH', 'FRA', 'TXL');
+
+
+-- insert reservations
+INSERT INTO reservations (payment_status, created_at, created_by)
+VALUES ('1', '2018-03-20 02:42:11.00', '1');
+
+INSERT INTO reservations (payment_status, created_at, created_by)
+VALUES ('0', '2018-03-25 21:12:12.00', '2');
+
+INSERT INTO reservations (payment_status, created_at, created_by)
+VALUES ('1', '2018-02-01 23:42:12.00', '3');
+
+INSERT INTO reservations (payment_status, created_at, created_by)
+VALUES ('0', '2018-04-01 23:42:12.00', '4');
+
+-- insert tickets
+INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
+VALUES ('212-1241241421', '410', '2', '9802261040', 'BA0304', '12B', 'E');
+
+INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
+VALUES ('011-1251000221', '123', '4', '9102461030', 'EK123', '03F', 'B');
+
+-- insert search records
+INSERT INTO search_records (customer, flight)
+VALUES ('2', 'BA0304');
+
+INSERT INTO search_records (customer, flight)
+VALUES ('2', 'LH172');
+
+INSERT INTO search_records (customer, flight)
+VALUES ('4', 'EK123');
 
 -- =================================================================
 -- [ ] [3/5] SQL skript s několika dotazy SELECT
