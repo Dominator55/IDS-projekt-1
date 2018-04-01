@@ -263,7 +263,31 @@ INSERT INTO passengers (id, first_name, last_name)
 VALUES ('<rodnecislo>', 'Peter', 'Marko');
 
 INSERT INTO passengers (id, first_name, last_name)
-VALUES ('<rodnecislo>', 'Meno', 'Priezvisko');
+VALUES (9905291235, 'Meno', 'Priezvisko');
+
+INSERT INTO passengers (id, first_name, last_name)
+VALUES (9805291244, 'Meno', 'Priezvisko');
+
+INSERT INTO passengers (id, first_name, last_name)
+VALUES (9805291245, 'Meno', 'Priezvisko');
+
+INSERT INTO passengers (id, first_name, last_name)
+VALUES (9805291246, 'Meno', 'Priezvisko');
+
+INSERT INTO passengers (id, first_name, last_name)
+VALUES (9805291247, 'Meno', 'Priezvisko');
+
+INSERT INTO passengers (id, first_name, last_name)
+VALUES (6905291235, 'Dalibor', 'Masaryk');
+
+INSERT INTO passengers (id, first_name, last_name)
+VALUES (8502191235, 'Aurélia', 'Dubovská');
+
+INSERT INTO passengers (id, first_name, last_name)
+VALUES (73115291233, 'Mohamed', 'Lee');
+
+INSERT INTO passengers (id, first_name, last_name)
+VALUES (9705791235, 'Teódor', 'Ladislav');
 
 
 -- generator used: https://names.igopaygo.com/people/fake-person
@@ -278,6 +302,9 @@ VALUES ('Zelda', 'Reel', 'zelda.reel@autozone-inc.info', '4326 Lazy Sky Via', 'W
 
 INSERT INTO customers (first_name, last_name, email, addr_street, addr_town, addr_post_code, addr_state)
 VALUES ('Sherwin', 'Hsu', 'sherwinhsu@diaperstack.com', '9264 Silver Lagoon Concession', 'Maryland', '21922-7045', 'USA');
+
+INSERT INTO customers (first_name, last_name, email, addr_street, addr_town, addr_post_code, addr_state)
+VALUES ('Teódor', 'Ladislav', 'teodorL@gmail.com', '4 S. Chalupku', 'Prievidza', '97101', 'Slovakia');
 
 
 
