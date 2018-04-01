@@ -80,7 +80,7 @@
 
   CREATE TABLE airlines (
     /* Airline code in official IATA format; Example: CX */
-    airline_code    VARCHAR(2) NOT NULL PRIMARY KEY CHECK(REGEXP_LIKE(airline_code,'[A-Z0-9]{2}'),
+    airline_code    VARCHAR(2) NOT NULL PRIMARY KEY CHECK(REGEXP_LIKE(airline_code,'[A-Z0-9]{2}')),
     full_name       VARCHAR(100) NOT NULL,
     nationality     VARCHAR(100) NOT NULL,
     hub             VARCHAR(3),
@@ -169,7 +169,7 @@
   CREATE TABLE search_records (
     id        NUMBER NOT NULL PRIMARY KEY,
     customer  NUMBER NOT NULL,
-    flight    NUMBER NOT NULL REFERENCES flights(flight_number),
+    flight    NUMBER NOT NULL,
 
     CONSTRAINT searched_by_customer_fk  FOREIGN KEY (customer)  REFERENCES customers(id),
     CONSTRAINT searched_for_flight_fk   FOREIGN KEY (flight)    REFERENCES flights(flight_number)
@@ -179,46 +179,94 @@
   INSERT SAMPLE DATA 
 ---------------------- */
 
-INSERT INTO airlines (airline_code, full_name, nationality, hub)
-VALUES ('AA', 'American Airlines', 'USA', 'DFW'),
-       ('LH', 'Lufthansa', 'Germany', 'FRA'),
-       ('AF', 'Air France', 'France', 'CDG'),
-       ('BA', 'British Airways', 'United Kingdom ', 'LHR'),
-       ('TK', 'Turkish Airlines', 'Turkey', 'IST'),
-       ('EK', 'Emirates', 'United Arab Emirates', 'DXB');
-
--- info from: https://seatguru.com/
-INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
-VALUES ('Airbus', 'A380-800', '14', '76', '399', 'EK'),
-       ('Boeing', '777-300ER', '8', '42', '304', 'EK'),
-       ('Airbus', 'A330-200', '0', '40', '147', 'AF'),
-       ('Airbus', 'A330-200', '0', '20', '224', 'AA'),
-       ('Boeing', '767-300', '0', '28', '160', 'AA'),
-       ('Boeing', '767-300', '0', '28', '160', 'AA'),
-       ('Boeing', '747-400', '14', '86', '145', 'BA'),
-       ('Airbus', 'A330-200', '0', '22', '228', 'TK');
+INSERT INTO airports (airport_code, city, country)
+VALUES ('FRA', 'Frankfurt', 'Germany');
 
 INSERT INTO airports (airport_code, city, country)
-VALUES ('FRA', 'Frankfurt', 'Germany'),
-       ('CDG', 'Paris', 'France'),
-       ('IST', 'Istanbul', 'Turkey'),
-       ('LHR', 'London', 'United Kingdom'),
-       ('DXB', 'Dubai', 'United Arab Emirates'),
-       ('DFW', 'Dallas', 'USA');
+VALUES ('CDG', 'Paris', 'France');
 
+INSERT INTO airports (airport_code, city, country)
+VALUES ('IST', 'Istanbul', 'Turkey');
+
+INSERT INTO airports (airport_code, city, country)
+VALUES ('LHR', 'London', 'United Kingdom');
+
+INSERT INTO airports (airport_code, city, country)
+VALUES ('DXB', 'Dubai', 'United Arab Emirates');
+
+INSERT INTO airports (airport_code, city, country)
+VALUES ('DFW', 'Dallas', 'USA');
+
+-- info from wikipedia ; list of airlines
+INSERT INTO airlines (airline_code, full_name, nationality, hub)
+VALUES ('AA', 'American Airlines', 'USA', 'DFW');
+
+INSERT INTO airlines (airline_code, full_name, nationality, hub)
+VALUES ('LH', 'Lufthansa', 'Germany', 'FRA');
+
+INSERT INTO airlines (airline_code, full_name, nationality, hub)
+VALUES ('AF', 'Air France', 'France', 'CDG');
+
+INSERT INTO airlines (airline_code, full_name, nationality, hub)
+VALUES ('BA', 'British Airways', 'United Kingdom ', 'LHR');
+
+INSERT INTO airlines (airline_code, full_name, nationality, hub)
+VALUES ('TK', 'Turkish Airlines', 'Turkey', 'IST');
+
+INSERT INTO airlines (airline_code, full_name, nationality, hub)
+VALUES ('EK', 'Emirates', 'United Arab Emirates', 'DXB');
+
+-- info from: https://seatguru.com/
+-- TODO: pridat autoincrement na ID alebo pridat priamo ID 
+INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
+VALUES ('Airbus', 'A380-800', '14', '76', '399', 'EK');
+
+INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
+VALUES ('Boeing', '777-300ER', '8', '42', '304', 'EK');
+
+INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
+VALUES ('Airbus', 'A330-200', '0', '40', '147', 'AF');
+
+INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
+VALUES ('Airbus', 'A330-200', '0', '20', '224', 'AA');
+
+INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
+VALUES ('Boeing', '767-300', '0', '28', '160', 'AA');
+
+INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
+VALUES ('Boeing', '767-300', '0', '28', '160', 'AA');
+
+INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
+VALUES ('Boeing', '747-400', '14', '86', '145', 'BA');
+
+INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
+VALUES ('Airbus', 'A330-200', '0', '22', '228', 'TK');
+
+
+
+-- TODO: pridat rodne cisla
+INSERT INTO passengers (id, first_name, last_name)
+VALUES ('<rodnecislo>', 'Andrej', 'Nano');
 
 INSERT INTO passengers (id, first_name, last_name)
-VALUES ('<rodnecislo>', 'Andrej', 'Nano'),
-       ('<rodnecislo>', 'Peter', 'Marko'),
-       ('<rodnecislo>', 'Meno', 'Priezvisko');
+VALUES ('<rodnecislo>', 'Peter', 'Marko');
+
+INSERT INTO passengers (id, first_name, last_name)
+VALUES ('<rodnecislo>', 'Meno', 'Priezvisko');
 
 
 -- generator used: https://names.igopaygo.com/people/fake-person
 INSERT INTO customers (first_name, last_name, email, addr_street, addr_town, addr_post_code, addr_state)
-VALUES ('Chahaya', 'Miles', 'ch.mile@egl-inc.info', '5542 Thunder Log Trail', 'Quebec City', 'G6R-5B7', 'Canada'),
-       ('Ifor', 'Smoak', 'iforsmoa@diaperstack.com', '3909 Tawny View Rise', 'New York', '12379-2763', 'USA'),
-       ('Zelda', 'Reel', 'zelda.reel@autozone-inc.info', '4326 Lazy Sky Via', 'West Virginia', '26499-7868', 'USA'),
-       ('Sherwin', 'Hsu', 'sherwinhsu@diaperstack.com', '9264 Silver Lagoon Concession', 'Maryland', '21922-7045', 'USA');
+VALUES ('Chahaya', 'Miles', 'ch.mile@egl-inc.info', '5542 Thunder Log Trail', 'Quebec City', 'G6R-5B7', 'Canada');
+
+INSERT INTO customers (first_name, last_name, email, addr_street, addr_town, addr_post_code, addr_state)
+VALUES ('Ifor', 'Smoak', 'iforsmoa@diaperstack.com', '3909 Tawny View Rise', 'New York', '12379-2763', 'USA');
+
+INSERT INTO customers (first_name, last_name, email, addr_street, addr_town, addr_post_code, addr_state)
+VALUES ('Zelda', 'Reel', 'zelda.reel@autozone-inc.info', '4326 Lazy Sky Via', 'West Virginia', '26499-7868', 'USA');
+
+INSERT INTO customers (first_name, last_name, email, addr_street, addr_town, addr_post_code, addr_state)
+VALUES ('Sherwin', 'Hsu', 'sherwinhsu@diaperstack.com', '9264 Silver Lagoon Concession', 'Maryland', '21922-7045', 'USA');
 
 
 
