@@ -187,6 +187,56 @@
     CONSTRAINT searched_for_flight_fk   FOREIGN KEY (flight)    REFERENCES flights(flight_number)
   );
 
+  CREATE OR REPLACE TRIGGER f_ticket_trig BEFORE
+    INSERT ON tickets
+    FOR EACH ROW
+    WHEN (NEW.seat_class = 'F')
+    BEGIN
+        UPDATE flights
+        SET fclass_seats_free = fclass_seats_free - 1
+        WHERE flights.flight_number = :NEW.flight;
+    END;
+  /
+  CREATE OR REPLACE TRIGGER b_ticket_trig BEFORE
+    INSERT ON tickets
+    FOR EACH ROW
+    WHEN (NEW.seat_class = 'B')
+    BEGIN
+        UPDATE flights
+        SET bclass_seats_free = bclass_seats_free - 1
+        WHERE flights.flight_number = :NEW.flight;
+    END;
+  /
+  CREATE OR REPLACE TRIGGER e_ticket_trig BEFORE
+    INSERT ON tickets
+    FOR EACH ROW
+    WHEN (NEW.seat_class = 'E')
+    BEGIN
+        UPDATE flights
+        SET eclass_seats_free = eclass_seats_free - 1
+        WHERE flights.flight_number = :NEW.flight;
+    END;
+  /
+  CREATE OR REPLACE TRIGGER flight_trig BEFORE
+    INSERT ON flights
+    FOR EACH ROW
+    BEGIN
+        SELECT fclass_seats
+        INTO : NEW.fclass_seats_free
+        FROM airplanes
+        WHERE airplanes.id = :NEW.airplane;
+        
+        SELECT bclass_seats
+        INTO : NEW.bclass_seats_free
+        FROM airplanes
+        WHERE airplanes.id = :NEW.airplane;
+        
+        SELECT eclass_seats
+        INTO : NEW.eclass_seats_free
+        FROM airplanes
+        WHERE airplanes.id = :NEW.airplane;
+    END;
+  /
   CREATE OR REPLACE TRIGGER airplane_trig BEFORE
     INSERT ON airplanes
     FOR EACH ROW
@@ -354,14 +404,17 @@ VALUES ('Teódor', 'Ladislav', 'teodorL@gmail.com', '4 S. Chalupku', 'Prievidza'
 
 
 -- insert flights
-INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination, fclass_seats_free, bclass_seats_free, eclass_seats_free)
-VALUES ('BA0304', TIMESTAMP '2018-04-20 07:20:00.00 +00:00', TIMESTAMP  '2018-04-20 09:35:00.00 +01:00', 9, 'BA', 'LHR', 'CDG', 30, 60, 90);
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
+VALUES ('BA0304', TIMESTAMP '2018-04-20 07:20:00.00 +00:00', TIMESTAMP  '2018-04-20 09:35:00.00 +01:00', 9, 'BA', 'LHR', 'CDG');
 
-INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination, fclass_seats_free, bclass_seats_free, eclass_seats_free)
-VALUES ('EK1234', TIMESTAMP '2018-04-14 11:20:00.00 +04:00', TIMESTAMP '2018-04-14 14:55:00.00 +03:00', 1, 'EK', 'DXB', 'IST', 20, 70, 90);
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
+VALUES ('EK1234', TIMESTAMP '2018-04-14 11:20:00.00 +04:00', TIMESTAMP '2018-04-14 14:55:00.00 +03:00', 1, 'EK', 'DXB', 'IST');
 
-INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination, fclass_seats_free, bclass_seats_free, eclass_seats_free)
-VALUES ('LH1724', TIMESTAMP'2018-04-20 06:15:00.00 +01:00', TIMESTAMP '2018-04-20 07:55:00.00 +01:00', 10, 'LH', 'FRA', 'TXL', 40, 50, 90);
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
+VALUES ('LH1724', TIMESTAMP'2018-04-20 06:15:00.00 +01:00', TIMESTAMP '2018-04-20 07:55:00.00 +01:00', 10, 'LH', 'FRA', 'TXL');
+
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
+VALUES ('LH1725', TIMESTAMP'2018-04-21 06:15:00.00 +01:00', TIMESTAMP '2018-04-21 07:55:00.00 +01:00', 10, 'LH', 'FRA', 'TXL');
 
 
 -- insert reservations
@@ -398,6 +451,8 @@ VALUES (1, 'EK1234');
 -- [ ] [3/5] SQL skript s několika dotazy SELECT
 -- =================================================================
 
+select *
+from flights;
 
 -- =================================================================
 -- [ ] [4/5] SQL skript pro vytvoření pokročilých objektů schématu
