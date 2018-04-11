@@ -195,7 +195,7 @@
         INTO : NEW.id
         FROM dual;
     END;
-  
+  /
   CREATE OR REPLACE TRIGGER reservation_trig BEFORE
     INSERT ON reservations
     FOR EACH ROW
@@ -204,7 +204,7 @@
         INTO : NEW.id
         FROM dual;
     END;
-
+/
     CREATE OR REPLACE TRIGGER search_record_trig BEFORE
     INSERT ON search_records
     FOR EACH ROW
@@ -213,7 +213,7 @@
         INTO : NEW.id
         FROM dual;
     END;
-
+/
     CREATE OR REPLACE TRIGGER customer_trig BEFORE
     INSERT ON customers
     FOR EACH ROW
@@ -222,7 +222,7 @@
         INTO : NEW.id
         FROM dual;
     END;
-  
+  /
 /* ---------------------
   INSERT SAMPLE DATA 
 ---------------------- */
@@ -333,66 +333,66 @@ INSERT INTO passengers (id, first_name, last_name)
 VALUES (73115291233, 'Mohamed', 'Lee');
 
 INSERT INTO passengers (id, first_name, last_name)
-VALUES (9705791235, 'Teódor', 'Ladislav');
+VALUES (97057912356, 'Teódor', 'Ladislav');
 
 
 -- generator used: https://names.igopaygo.com/people/fake-person
 INSERT INTO customers (first_name, last_name, email, addr_street, addr_town, addr_post_code, addr_state)
-VALUES ('Chahaya', 'Miles', 'ch.mile@egl-inc.info', '5542 Thunder Log Trail', 'Quebec City', 'G6R-5B7', 'Canada');
+VALUES ('Chahaya', 'Miles', 'ch.mile@egl-inc.info', '5542 Thunder Log Trail', 'Quebec City', 7542, 'Canada');
 
 INSERT INTO customers (first_name, last_name, email, addr_street, addr_town, addr_post_code, addr_state)
-VALUES ('Ifor', 'Smoak', 'iforsmoa@diaperstack.com', '3909 Tawny View Rise', 'New York', '12379-2763', 'USA');
+VALUES ('Ifor', 'Smoak', 'iforsmoa@diaperstack.com', '3909 Tawny View Rise', 'New York', 1237, 'USA');
 
 INSERT INTO customers (first_name, last_name, email, addr_street, addr_town, addr_post_code, addr_state)
-VALUES ('Zelda', 'Reel', 'zelda.reel@autozone-inc.info', '4326 Lazy Sky Via', 'West Virginia', '26499-7868', 'USA');
+VALUES ('Zelda', 'Reel', 'zelda.reel@autozone-inc.info', '4326 Lazy Sky Via', 'West Virginia', 2649, 'USA');
 
 INSERT INTO customers (first_name, last_name, email, addr_street, addr_town, addr_post_code, addr_state)
-VALUES ('Sherwin', 'Hsu', 'sherwinhsu@diaperstack.com', '9264 Silver Lagoon Concession', 'Maryland', '21922-7045', 'USA');
+VALUES ('Sherwin', 'Hsu', 'sherwinhsu@diaperstack.com', '9264 Silver Lagoon Concession', 'Maryland', 1922, 'USA');
 
 INSERT INTO customers (first_name, last_name, email, addr_street, addr_town, addr_post_code, addr_state)
-VALUES ('Teódor', 'Ladislav', 'teodorL@gmail.com', '4 S. Chalupku', 'Prievidza', '97101', 'Slovakia');
+VALUES ('Teódor', 'Ladislav', 'teodorL@gmail.com', '4 S. Chalupku', 'Prievidza', 97101, 'Slovakia');
 
 
 -- insert flights
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination, fclass_seats_free, bclass_seats_free, eclass_seats_free)
-VALUES ('BA0304', '2018-04-20 07:20:00.00 +00:00', '2018-04-20 09:35:00.00 +01:00', '9', 'BA', 'LHR', 'CDG');
+VALUES ('BA0304', TIMESTAMP '2018-04-20 07:20:00.00 +00:00', TIMESTAMP  '2018-04-20 09:35:00.00 +01:00', 9, 'BA', 'LHR', 'CDG', 30, 60, 90);
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination, fclass_seats_free, bclass_seats_free, eclass_seats_free)
-VALUES ('EK123', '2018-04-14 11:20:00.00 +04:00', '2018-04-14 14:55:00.00 +03:00', '1', 'EK', 'DXB', 'IST');
+VALUES ('EK1234', TIMESTAMP '2018-04-14 11:20:00.00 +04:00', TIMESTAMP '2018-04-14 14:55:00.00 +03:00', 1, 'EK', 'DXB', 'IST', 20, 70, 90);
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination, fclass_seats_free, bclass_seats_free, eclass_seats_free)
-VALUES ('LH172', '2018-04-20 06:15:00.00 +01:00', '2018-04-20 07:55:00.00 +01:00', '10', 'LH', 'FRA', 'TXL');
+VALUES ('LH1724', TIMESTAMP'2018-04-20 06:15:00.00 +01:00', TIMESTAMP '2018-04-20 07:55:00.00 +01:00', 10, 'LH', 'FRA', 'TXL', 40, 50, 90);
 
 
 -- insert reservations
 INSERT INTO reservations (payment_status, created_at, created_by)
-VALUES ('1', '2018-03-20 02:42:11.00', '1');
+VALUES ('1', TIMESTAMP '2018-03-20 02:42:11.00', '1');
 
 INSERT INTO reservations (payment_status, created_at, created_by)
-VALUES ('0', '2018-03-25 21:12:12.00', '2');
+VALUES ('0', TIMESTAMP '2018-03-25 21:12:12.00', '2');
 
 INSERT INTO reservations (payment_status, created_at, created_by)
-VALUES ('1', '2018-02-01 23:42:12.00', '3');
+VALUES ('1', TIMESTAMP '2018-02-01 23:42:12.00', '3');
 
 INSERT INTO reservations (payment_status, created_at, created_by)
-VALUES ('0', '2018-04-01 23:42:12.00', '4');
+VALUES ('0', TIMESTAMP '2018-04-01 23:42:12.00', '4');
 
 -- insert tickets
 INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
-VALUES ('212-1241241421', '410', '2', '9802261040', 'BA0304', '12B', 'E');
+VALUES ('212-1241241421', 410, 2, 9802261040, 'BA0304', '12B', 'E');
 
 INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
-VALUES ('011-1251000221', '123', '4', '9102461030', 'EK123', '03F', 'B');
+VALUES ('011-1251000221', 123, 4, 9812345678, 'EK1234', '03F', 'B');
 
 -- insert search records
 INSERT INTO search_records (customer, flight)
-VALUES ('2', 'BA0304');
+VALUES (1, 'BA0304');
 
 INSERT INTO search_records (customer, flight)
-VALUES ('2', 'LH172');
+VALUES (1, 'LH1724');
 
 INSERT INTO search_records (customer, flight)
-VALUES ('4', 'EK123');
+VALUES (1, 'EK1234');
 
 -- =================================================================
 -- [ ] [3/5] SQL skript s několika dotazy SELECT
