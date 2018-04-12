@@ -93,7 +93,7 @@
 
   CREATE TABLE airlines (
     /* Airline code in official IATA format; Example: CX */
-    airline_code    VARCHAR(2) NOT NULL PRIMARY KEY CHECK(REGEXP_LIKE(airline_code,'[A-Z0-9]{2}')),
+    airline    VARCHAR(2) NOT NULL PRIMARY KEY CHECK(REGEXP_LIKE(airline,'[A-Z0-9]{2}')),
     full_name       VARCHAR(100) NOT NULL,
     nationality     VARCHAR(100) NOT NULL,
     hub             VARCHAR(3),
@@ -111,7 +111,7 @@
     eclass_seats      NUMBER NOT NULL,  -- economy class = 3.
     airline           VARCHAR(2),
 
-    CONSTRAINT airplane_owner_airline_fk FOREIGN KEY (airline) REFERENCES airlines(airline_code)
+    CONSTRAINT airplane_owner_airline_fk FOREIGN KEY (airline) REFERENCES airlines(airline)
   );
 
 
@@ -127,11 +127,14 @@
     origin            VARCHAR(3) NOT NULL,
     destination       VARCHAR(3) NOT NULL,
     fclass_seats_free NUMBER,
+    constraint fclass_uint_seats check (fclass_seats_free >= 0),
     bclass_seats_free NUMBER,
+    constraint bclass_uint_seats check (bclass_seats_free >= 0),
     eclass_seats_free NUMBER,
+    constraint eclass_uint_seats check (eclass_seats_free >= 0),
 
     CONSTRAINT flight_with_airplane_fk        FOREIGN KEY (airplane)    REFERENCES airplanes(id),
-    CONSTRAINT flight_operated_by_airline_fk  FOREIGN KEY (airline)     REFERENCES airlines(airline_code),
+    CONSTRAINT flight_operated_by_airline_fk  FOREIGN KEY (airline)     REFERENCES airlines(airline),
     CONSTRAINT flight_origin_airport_fk       FOREIGN KEY (origin)      REFERENCES airports(airport_code),
     CONSTRAINT flight_destination_airport_fk  FOREIGN KEY (destination) REFERENCES airports(airport_code)
   );
@@ -298,25 +301,37 @@ VALUES ('DFW', 'Dallas', 'USA');
 INSERT INTO airports (airport_code, city, country)
 VALUES ('TXL', 'Berlin', 'Germany');
 
+INSERT INTO airports (airport_code, city, country)
+VALUES ('JFK', 'New York', 'USA');
+
+INSERT INTO airports (airport_code, city, country)
+VALUES ('HEL', 'Helsinky', 'Finland');
+
 
 -- info from wikipedia ; list of airlines
-INSERT INTO airlines (airline_code, full_name, nationality, hub)
+INSERT INTO airlines (airline, full_name, nationality, hub)
 VALUES ('AA', 'American Airlines', 'USA', 'DFW');
 
-INSERT INTO airlines (airline_code, full_name, nationality, hub)
+INSERT INTO airlines (airline, full_name, nationality, hub)
 VALUES ('LH', 'Lufthansa', 'Germany', 'FRA');
 
-INSERT INTO airlines (airline_code, full_name, nationality, hub)
+INSERT INTO airlines (airline, full_name, nationality, hub)
 VALUES ('AF', 'Air France', 'France', 'CDG');
 
-INSERT INTO airlines (airline_code, full_name, nationality, hub)
+INSERT INTO airlines (airline, full_name, nationality, hub)
 VALUES ('BA', 'British Airways', 'United Kingdom ', 'LHR');
 
-INSERT INTO airlines (airline_code, full_name, nationality, hub)
+INSERT INTO airlines (airline, full_name, nationality, hub)
 VALUES ('TK', 'Turkish Airlines', 'Turkey', 'IST');
 
-INSERT INTO airlines (airline_code, full_name, nationality, hub)
+INSERT INTO airlines (airline, full_name, nationality, hub)
 VALUES ('EK', 'Emirates', 'United Arab Emirates', 'DXB');
+
+INSERT INTO airlines (airline, full_name, nationality, hub)
+VALUES ('FZ', 'flydubai', 'United Arab Emirates', 'DXB');
+
+INSERT INTO airlines (airline, full_name, nationality, hub)
+VALUES ('AY', 'Finnair Oyj', 'Finland', 'HEL');
 
 
 -- info from: https://seatguru.com/
@@ -408,13 +423,25 @@ INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airl
 VALUES ('BA0304', TIMESTAMP '2018-04-20 07:20:00.00 +00:00', TIMESTAMP  '2018-04-20 09:35:00.00 +01:00', 9, 'BA', 'LHR', 'CDG');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('EK1234', TIMESTAMP '2018-04-14 11:20:00.00 +04:00', TIMESTAMP '2018-04-14 14:55:00.00 +03:00', 1, 'EK', 'DXB', 'IST');
+VALUES ('EK1234', TIMESTAMP '2018-04-14 11:20:00.00 +04:00', TIMESTAMP '2018-04-14 14:55:00.00 +03:00', 2, 'EK', 'DXB', 'IST');
+
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
+VALUES ('AA0000', TIMESTAMP '2018-05-09 16:40:00.00 +04:00', TIMESTAMP '2018-05-09 20:20:00.00 +03:00', 3, 'FZ', 'DXB', 'IST');
+
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
+VALUES ('AA0001', TIMESTAMP '2018-05-11 19:50:00.00 +00:00', TIMESTAMP '2018-05-11 22:30:00.00 -05:00', 1, 'BA', 'LHR', 'JFK');
+
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
+VALUES ('AA0002', TIMESTAMP '2018-05-20 8:30:00.00 +00:00', TIMESTAMP '2018-05-20 11:10:00.00 -05:00', 1, 'BA', 'LHR', 'JFK');
+
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
+VALUES ('AA0003', TIMESTAMP '2018-05-20 8:30:00.00 +00:00', TIMESTAMP '2018-05-20 11:10:00.00 -05:00', 7, 'AY', 'LHR', 'JFK');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
 VALUES ('LH1724', TIMESTAMP'2018-04-20 06:15:00.00 +01:00', TIMESTAMP '2018-04-20 07:55:00.00 +01:00', 10, 'LH', 'FRA', 'TXL');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('LH1725', TIMESTAMP'2018-04-21 06:15:00.00 +01:00', TIMESTAMP '2018-04-21 07:55:00.00 +01:00', 10, 'LH', 'FRA', 'TXL');
+VALUES ('LH1725', TIMESTAMP'2018-04-27 06:15:00.00 +01:00', TIMESTAMP '2018-04-27 07:55:00.00 +01:00', 10, 'LH', 'FRA', 'TXL');
 
 
 -- insert reservations
@@ -454,6 +481,14 @@ VALUES (1, 'EK1234');
 select *
 from flights;
 
+select *
+from airplanes; 
+
+-- kto prevadzkuje lety z London do New York?
+SELECT DISTINCT full_name
+from  flights NATURAL JOIN airlines, airports A1, airports A2
+where flights.origin = A1.airport_code AND flights.destination = A2.airport_code AND
+A1.city = 'London' AND A2.city = 'New York';
 -- =================================================================
 -- [ ] [4/5] SQL skript pro vytvoření pokročilých objektů schématu
 -- =================================================================
