@@ -1,6 +1,6 @@
 -- =================================================================
 -- Name: IDS Projekt - SQL
--- Description: School Database Systems project
+-- Description: School Database Systems project, SQL for Oracle 12c 
 -- Authors: Andrej Nano (xnanoa00)
 --          Peter Marko (xmarko15)
 -- Repository: https://github.com/andrejnano/IDS-projekt
@@ -26,8 +26,6 @@
 -- =================================================================
 -- [ ] [2/5] SQL skript pro vytvoření základních objektů schématu
 -- =================================================================
-
-/* TODO: payment info ( credit cards ), seating info storing, */
 
 /*
     __SUMMARY__
@@ -116,10 +114,9 @@
 
 
   /* Reservation system */
-
   CREATE TABLE flights (
     /* Flight Number in IATA official format; Example: BA026 */
-    flight_number     VARCHAR(6) NOT NULL PRIMARY KEY CHECK(REGEXP_LIKE(flight_number, '[a-zA-Z]{2}[0-9]{4}')),
+    flight_number     VARCHAR(6) NOT NULL PRIMARY KEY CHECK(REGEXP_LIKE(flight_number, '[0-9a-zA-Z]{2}[0-9]{4}')),
     departure_time    TIMESTAMP WITH TIME ZONE NOT NULL,
     arrival_time      TIMESTAMP WITH TIME ZONE NOT NULL,
     airplane          NUMBER,
@@ -308,6 +305,7 @@ INSERT INTO airports (airport_code, city, country)
 VALUES ('HEL', 'Helsinky', 'Finland');
 
 
+
 -- info from wikipedia ; list of airlines
 INSERT INTO airlines (airline, full_name, nationality, hub)
 VALUES ('AA', 'American Airlines', 'USA', 'DFW');
@@ -332,6 +330,9 @@ VALUES ('FZ', 'flydubai', 'United Arab Emirates', 'DXB');
 
 INSERT INTO airlines (airline, full_name, nationality, hub)
 VALUES ('AY', 'Finnair Oyj', 'Finland', 'HEL');
+
+INSERT INTO airlines (airline, full_name, nationality, hub)
+VALUES ('OS', 'Austrian', 'Austria', 'VIE');
 
 
 -- info from: https://seatguru.com/
@@ -365,6 +366,9 @@ VALUES ('Airbus', 'A319', '0', '12', '100', 'BA');
 
 INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
 VALUES ('Airbus', 'A330-300', '8', '42', '145', 'LH');
+
+INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
+VALUES ('Boeing', '767-300', '0', '36', '176', 'OS');
 
 
 INSERT INTO passengers (id, first_name, last_name)
@@ -443,6 +447,16 @@ VALUES ('LH1724', TIMESTAMP'2018-04-20 06:15:00.00 +01:00', TIMESTAMP '2018-04-2
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
 VALUES ('LH1725', TIMESTAMP'2018-04-27 06:15:00.00 +01:00', TIMESTAMP '2018-04-27 07:55:00.00 +01:00', 10, 'LH', 'FRA', 'TXL');
 
+-- same day, same destination & origin
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
+VALUES ('OS0089', TIMESTAMP'2018-04-25 10:15:00.00 +01:00', TIMESTAMP '2018-04-25 13:50:00.00 -04:00', 11, 'OS', 'VIE', 'JFK');
+
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
+VALUES ('LH1235', TIMESTAMP'2018-04-25 11:10:00.00 +01:00', TIMESTAMP '2018-04-25 15:45:00.00 -04:00', 7, 'LH', 'VIE', 'JFK');
+
+
+
+
 
 -- insert reservations
 INSERT INTO reservations (payment_status, created_at, created_by)
@@ -457,12 +471,16 @@ VALUES ('1', TIMESTAMP '2018-02-01 23:42:12.00', '3');
 INSERT INTO reservations (payment_status, created_at, created_by)
 VALUES ('0', TIMESTAMP '2018-04-01 23:42:12.00', '4');
 
+
+
 -- insert tickets
 INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
 VALUES ('212-1241241421', 410, 2, 9802261040, 'BA0304', '12B', 'E');
 
 INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
 VALUES ('011-1251000221', 123, 4, 9812345678, 'EK1234', '03F', 'B');
+
+
 
 -- insert search records
 INSERT INTO search_records (customer, flight)
@@ -478,17 +496,73 @@ VALUES (1, 'EK1234');
 -- [ ] [3/5] SQL skript s několika dotazy SELECT
 -- =================================================================
 
-select *
-from flights;
+/*
+  SQL skript obsahující dotazy SELECT musí obsahovat konkrétně 
+  alespoň dva dotazy využívající spojení dvou tabulek, jeden 
+  využívající spojení tří tabulek, dva dotazy s klauzulí 
+  GROUP BY a agregační funkcí, jeden dotaz obsahující predikát 
+  EXISTS a jeden dotaz s predikátem IN s vnořeným selectem 
+  (nikoliv IN s množinou konstatních dat). U každého z dotazů 
+  musí být (v komentáři SQL kódu) popsáno srozumitelně, jaká 
+  data hledá daný dotaz (jaká je jeho funkce v aplikaci).
+*/
 
-select *
-from airplanes; 
+-- 2 dotazy (JOIN 2 tables)
 
--- kto prevadzkuje lety z London do New York?
-SELECT DISTINCT full_name
-from  flights NATURAL JOIN airlines, airports A1, airports A2
-where flights.origin = A1.airport_code AND flights.destination = A2.airport_code AND
-A1.city = 'London' AND A2.city = 'New York';
+-- 1 dotaz (JOIN 3 tables)
+
+  -- [ ]
+  
+
+-- 2 dotazy (GROUP BY & agregacna funkcia)
+  
+  -- [ ]
+
+  -- [ ]
+
+
+-- 1 dotaz (EXISTS)
+  
+  -- [ ]
+
+
+-- 1 dotaz (predikat IN s vnorenym selectom)
+
+  -- [ ]
+
+
+  
+  -- Vypis vsetky lety Vieden->New York alebo hocijake ine mesta
+  SELECT flights.code, flights.departure_time, flights.arrival_time
+  FROM flights 
+  WHERE flights.origin IN (
+    SELECT airport_code FROM airports WHERE airport.city = 'Vienna';
+  ) 
+  AND flights.destination IN (
+    SELECT airport_code FROM airports WHERE airport.city = 'New York';
+  );
+
+  -- Kolko letov lieta z Viedne ?
+  SELECT count(*)
+  FROM flights JOIN airports ON flights.origin = airports.airport_code
+  WHERE airports.city = 'Vienna';
+
+
+  -- kto prevadzkuje lety z London do New York?
+  SELECT DISTINCT full_name
+  from  flights NATURAL JOIN airlines, airports A1, airports A2
+  where flights.origin = A1.airport_code AND flights.destination = A2.airport_code AND
+  A1.city = 'London' AND A2.city = 'New York';
+
+
+
+  select *
+  from flights;
+
+  select *
+  from airplanes; 
+
+
 -- =================================================================
 -- [ ] [4/5] SQL skript pro vytvoření pokročilých objektů schématu
 -- =================================================================
