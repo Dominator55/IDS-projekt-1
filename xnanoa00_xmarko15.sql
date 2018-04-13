@@ -290,6 +290,9 @@ INSERT INTO airports (airport_code, city, country)
 VALUES ('LHR', 'London', 'United Kingdom');
 
 INSERT INTO airports (airport_code, city, country)
+VALUES ('LGW', 'London', 'United Kingdom');
+
+INSERT INTO airports (airport_code, city, country)
 VALUES ('DXB', 'Dubai', 'United Arab Emirates');
 
 INSERT INTO airports (airport_code, city, country)
@@ -303,6 +306,9 @@ VALUES ('JFK', 'New York', 'USA');
 
 INSERT INTO airports (airport_code, city, country)
 VALUES ('HEL', 'Helsinky', 'Finland');
+
+INSERT INTO airports (airport_code, city, country)
+VALUES ('VIE', 'Vienna', 'Austria');
 
 
 
@@ -424,36 +430,50 @@ VALUES ('Teódor', 'Ladislav', 'teodorL@gmail.com', '4 S. Chalupku', 'Prievidza'
 
 -- insert flights
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('BA0304', TIMESTAMP '2018-04-20 07:20:00.00 +00:00', TIMESTAMP  '2018-04-20 09:35:00.00 +01:00', 9, 'BA', 'LHR', 'CDG');
+VALUES ('BA0304', TIMESTAMP '2018-05-20 07:20:00.00 +00:00', TIMESTAMP  '2018-05-20 09:35:00.00 +01:00', 9, 'BA', 'LHR', 'CDG');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('EK1234', TIMESTAMP '2018-04-14 11:20:00.00 +04:00', TIMESTAMP '2018-04-14 14:55:00.00 +03:00', 2, 'EK', 'DXB', 'IST');
+VALUES ('EK1234', TIMESTAMP '2018-05-14 11:20:00.00 +04:00', TIMESTAMP '2018-05-14 14:55:00.00 +03:00', 2, 'EK', 'DXB', 'IST');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
 VALUES ('AA0000', TIMESTAMP '2018-05-09 16:40:00.00 +04:00', TIMESTAMP '2018-05-09 20:20:00.00 +03:00', 3, 'FZ', 'DXB', 'IST');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('AA0001', TIMESTAMP '2018-05-11 19:50:00.00 +00:00', TIMESTAMP '2018-05-11 22:30:00.00 -05:00', 1, 'BA', 'LHR', 'JFK');
+VALUES ('AA0001', TIMESTAMP '2018-05-11 19:50:00.00 +00:00', TIMESTAMP '2018-05-11 23:30:00.00 -04:00', 1, 'BA', 'LHR', 'JFK');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('AA0002', TIMESTAMP '2018-05-20 8:30:00.00 +00:00', TIMESTAMP '2018-05-20 11:10:00.00 -05:00', 1, 'BA', 'LHR', 'JFK');
+VALUES ('AA0002', TIMESTAMP '2018-05-20 8:30:00.00 +00:00', TIMESTAMP '2018-05-20 12:10:00.00 -04:00', 1, 'BA', 'LHR', 'JFK');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('AA0003', TIMESTAMP '2018-05-20 8:30:00.00 +00:00', TIMESTAMP '2018-05-20 11:10:00.00 -05:00', 7, 'AY', 'LHR', 'JFK');
+VALUES ('AA0003', TIMESTAMP '2018-05-21 8:30:00.00 +00:00', TIMESTAMP '2018-05-21 12:10:00.00 -04:00', 7, 'AY', 'LHR', 'JFK');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('LH1724', TIMESTAMP'2018-04-20 06:15:00.00 +01:00', TIMESTAMP '2018-04-20 07:55:00.00 +01:00', 10, 'LH', 'FRA', 'TXL');
+VALUES ('LH1724', TIMESTAMP'2018-05-20 06:15:00.00 +01:00', TIMESTAMP '2018-05-20 07:55:00.00 +01:00', 10, 'LH', 'FRA', 'TXL');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('LH1725', TIMESTAMP'2018-04-27 06:15:00.00 +01:00', TIMESTAMP '2018-04-27 07:55:00.00 +01:00', 10, 'LH', 'FRA', 'TXL');
+VALUES ('LH1725', TIMESTAMP'2018-05-27 06:15:00.00 +01:00', TIMESTAMP '2018-05-27 07:55:00.00 +01:00', 10, 'LH', 'FRA', 'TXL');
 
 -- same day, same destination & origin
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('OS0089', TIMESTAMP'2018-04-25 10:15:00.00 +01:00', TIMESTAMP '2018-04-25 13:50:00.00 -04:00', 11, 'OS', 'VIE', 'JFK');
+VALUES ('OS0089', TIMESTAMP'2018-05-25 10:15:00.00 +01:00', TIMESTAMP '2018-05-25 13:50:00.00 -04:00', 11, 'OS', 'VIE', 'JFK');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('LH1235', TIMESTAMP'2018-04-25 11:10:00.00 +01:00', TIMESTAMP '2018-04-25 15:45:00.00 -04:00', 7, 'LH', 'VIE', 'JFK');
+VALUES ('LH1235', TIMESTAMP'2018-05-25 11:10:00.00 +01:00', TIMESTAMP '2018-05-25 15:45:00.00 -04:00', 7, 'LH', 'VIE', 'JFK');
 
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
+VALUES ('AZ2275', TIMESTAMP'2018-05-30 8:00:00.00 +00:00', TIMESTAMP '2018-05-30 10:15:00.00 +01:00', 2, 'BA', 'LGW', 'VIE');
+
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
+VALUES ('AB3275', TIMESTAMP'2018-05-04 08:00:00.00 +02:00', TIMESTAMP '2018-05-04 08:45:00.00 +00:00', 11, 'AY', 'HEL', 'LGW');
+
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
+VALUES ('AC1275', TIMESTAMP'2018-05-05 18:00:00.00 +00:00', TIMESTAMP '2018-05-05 22:50:00.00 +02:00', 11, 'AY', 'LGW', 'HEL');
+
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
+VALUES ('BZ1275', TIMESTAMP'2018-05-25 04:10:00.00 +00:00', TIMESTAMP '2018-05-25 06:45:00.00 +01:00', 6, 'LH', 'LHR', 'FRA');
+
+INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
+VALUES ('LI1725', TIMESTAMP'2018-05-27 06:15:00.00 +01:00', TIMESTAMP '2018-05-27 07:55:00.00 +00:00', 10, 'LH', 'TXL', 'LHR');
 
 
 
@@ -469,7 +489,7 @@ INSERT INTO reservations (payment_status, created_at, created_by)
 VALUES ('1', TIMESTAMP '2018-02-01 23:42:12.00', '3');
 
 INSERT INTO reservations (payment_status, created_at, created_by)
-VALUES ('0', TIMESTAMP '2018-04-01 23:42:12.00', '4');
+VALUES ('0', TIMESTAMP '2018-05-01 23:42:12.00', '4');
 
 
 
@@ -479,6 +499,21 @@ VALUES ('212-1241241421', 410, 2, 9802261040, 'BA0304', '12B', 'E');
 
 INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
 VALUES ('011-1251000221', 123, 4, 9812345678, 'EK1234', '03F', 'B');
+
+INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
+VALUES ('011-1251077229', 142, 4, 97057912356, 'LH1724', '01B', 'B');
+
+INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
+VALUES ('021-1251077233', 142, 4, 97057912356, 'LH1725', '01B', 'B');
+
+INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
+VALUES ('021-1251077257', 172, 4, 97057912356, 'LI1725', '01C', 'B');
+
+INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
+VALUES ('021-1251077242', 112, 4, 9802261040, 'AZ2275', '01D', 'E');
+
+INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
+VALUES ('021-1251077299', 512, 4, 9802261040, 'AA0001', '05D', 'E');
 
 
 
@@ -508,38 +543,51 @@ VALUES (1, 'EK1234');
 */
 
 -- 2 dotazy (JOIN 2 tables)
-
+-- Ktore lety su prevadzakovane British Airways
+    SELECT *
+    from flights NATURAL JOIN airlines
+    WHERE  full_name = 'British Airways';
+    
+-- Ake typy lietadiel vlastni American Airlines
+    SELECT DISTINCT producer, model
+    from airlines NATURAL JOIN airplanes
+    WHERE  full_name = 'American Airlines';
 -- 1 dotaz (JOIN 3 tables)
-
-  -- [ ]
-  
+  -- Kto prevadzkuje lety z London do New York?
+  SELECT DISTINCT full_name
+  FROM  flights NATURAL JOIN airlines, airports A1, airports A2
+  WHERE A1.city = 'London' AND A2.city = 'New York' AND flights.origin = A1.airport_code AND flights.destination = A2.airport_code;
 
 -- 2 dotazy (GROUP BY & agregacna funkcia)
-  
-  -- [ ]
+  -- Vypis spolocnosti podla poctu destinacii, do ktorych lietaju
+  SELECT full_name, COUNT(DISTINCT A.airport_code)
+  FROM flights NATURAL JOIN airlines, airports A
+  WHERE flights.destination = A.airport_code
+  GROUP BY full_name
+  ORDER BY 2 DESC;
 
   -- [ ]
-
-
+-- ktory pasazieri maju zakupene viac ako 2 letenky?
+  SELECT p.first_name, p.last_name, COUNT(DISTINCT t.ticket_number)
+  FROM  tickets t, passengers p
+  WHERE t.passenger = p.id
+  GROUP BY p.first_name, p.last_name
+  HAVING COUNT(DISTINCT t.ticket_number) > 2;
 -- 1 dotaz (EXISTS)
   
   -- [ ]
 
 
 -- 1 dotaz (predikat IN s vnorenym selectom)
-
-  -- [ ]
-
-
   
   -- Vypis vsetky lety Vieden->New York alebo hocijake ine mesta
-  SELECT flights.code, flights.departure_time, flights.arrival_time
+  SELECT flights.flight_number , flights.departure_time, flights.arrival_time
   FROM flights 
   WHERE flights.origin IN (
-    SELECT airport_code FROM airports WHERE airport.city = 'Vienna';
+    SELECT airport_code FROM airports WHERE airports.city = 'Vienna'
   ) 
   AND flights.destination IN (
-    SELECT airport_code FROM airports WHERE airport.city = 'New York';
+    SELECT airport_code FROM airports WHERE airports.city = 'New York'
   );
 
   -- Kolko letov lieta z Viedne ?
@@ -548,19 +596,13 @@ VALUES (1, 'EK1234');
   WHERE airports.city = 'Vienna';
 
 
-  -- kto prevadzkuje lety z London do New York?
-  SELECT DISTINCT full_name
-  from  flights NATURAL JOIN airlines, airports A1, airports A2
-  where flights.origin = A1.airport_code AND flights.destination = A2.airport_code AND
-  A1.city = 'London' AND A2.city = 'New York';
-
-
-
   select *
   from flights;
 
   select *
-  from airplanes; 
+  from airports; 
+  select *
+  from airlines; 
 
 
 -- =================================================================
