@@ -554,10 +554,12 @@ VALUES (1, 'EK1234');
     WHERE  full_name = 'American Airlines';
     
 -- 1 dotaz (JOIN 3 tables)
+
   -- Kto prevadzkuje lety z London do New York?
   SELECT DISTINCT full_name
   FROM  flights NATURAL JOIN airlines, airports A1, airports A2
   WHERE A1.city = 'London' AND A2.city = 'New York' AND flights.origin = A1.airport_code AND flights.destination = A2.airport_code;
+
 
 -- 2 dotazy (GROUP BY & agregacna funkcia)
   
@@ -567,7 +569,6 @@ VALUES (1, 'EK1234');
   WHERE flights.destination = A.airport_code
   GROUP BY full_name
   ORDER BY 2 DESC;
-
     
   -- Ktory pasazieri maju zakupene viac ako 2 letenky?
   SELECT p.first_name, p.last_name, COUNT(DISTINCT t.ticket_number)
@@ -575,6 +576,7 @@ VALUES (1, 'EK1234');
   WHERE t.passenger = p.id
   GROUP BY p.first_name, p.last_name
   HAVING COUNT(DISTINCT t.ticket_number) > 2;
+
 -- 1 dotaz (EXISTS)
   
   -- Ktora letecka spolocnost lieta do Helsinki a New Yorku zaroven ? 
@@ -596,7 +598,7 @@ VALUES (1, 'EK1234');
 
 -- 1 dotaz (predikat IN s vnorenym selectom)
   
-  -- Vypis vsetky lety Vieden->New York alebo hocijake ine mesta
+  -- Vypis vsetky lety Vieden->New York (je mozne zamenit za ine mesta)
   SELECT flights.flight_number , flights.departure_time, flights.arrival_time
   FROM flights 
   WHERE flights.origin IN (
@@ -607,7 +609,7 @@ VALUES (1, 'EK1234');
   );
   
 
-  -- Kolko letov lieta z Viedne ?
+  -- Kolko letov lieta celkovo z Viedne ?
   SELECT city, count(*)
   FROM flights JOIN airports ON flights.origin = airports.airport_code
   WHERE airports.city = 'Vienna'
