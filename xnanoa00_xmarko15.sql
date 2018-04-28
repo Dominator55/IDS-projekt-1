@@ -671,12 +671,12 @@ VALUES (1, 'EK1234');
 
 
 --
--- Permissions for the second user
+-- Permissions for the second user (as Booking Agent, explained in documentation)
 --
-GRANT ALL ON airlines       TO xmarko15;
-GRANT ALL ON airplanes      TO xmarko15;
-GRANT ALL ON airports       TO xmarko15;
-GRANT ALL ON flights        TO xmarko15;
+GRANT SELECT ON flights     TO xmarko15;
+GRANT SELECT ON airlines    TO xmarko15;
+GRANT SELECT ON airports    TO xmarko15;
+
 GRANT ALL ON customers      TO xmarko15;
 GRANT ALL ON passengers     TO xmarko15;
 GRANT ALL ON reservations   TO xmarko15;
