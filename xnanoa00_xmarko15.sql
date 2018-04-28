@@ -343,7 +343,7 @@ INSERT INTO airports (airport_code, city, country)
 VALUES ('JFK', 'New York', 'USA');
 
 INSERT INTO airports (airport_code, city, country)
-VALUES ('HEL', 'Helsinky', 'Finland');
+VALUES ('HEL', 'Helsinki', 'Finland');
 
 INSERT INTO airports (airport_code, city, country)
 VALUES ('VIE', 'Vienna', 'Austria');
@@ -491,7 +491,6 @@ VALUES ('LH1724', TIMESTAMP'2018-05-20 06:15:00.00 +01:00', TIMESTAMP '2018-05-2
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
 VALUES ('LH1725', TIMESTAMP'2018-05-27 06:15:00.00 +01:00', TIMESTAMP '2018-05-27 07:55:00.00 +01:00', 10, 'LH', 'FRA', 'TXL');
 
--- same day, same destination & origin
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
 VALUES ('OS0089', TIMESTAMP'2018-05-25 10:15:00.00 +01:00', TIMESTAMP '2018-05-25 13:50:00.00 -04:00', 11, 'OS', 'VIE', 'JFK');
 
@@ -581,6 +580,7 @@ VALUES (1, 'EK1234');
 */
 
 -- 2 dotazy (JOIN 2 tables)
+
 -- Ktore lety su prevadzakovane British Airways
     SELECT *
     from flights NATURAL JOIN airlines
@@ -590,35 +590,53 @@ VALUES (1, 'EK1234');
     SELECT DISTINCT producer, model
     from airlines NATURAL JOIN airplanes
     WHERE  full_name = 'American Airlines';
+    
 -- 1 dotaz (JOIN 3 tables)
+
   -- Kto prevadzkuje lety z London do New York?
   SELECT DISTINCT full_name
   FROM  flights NATURAL JOIN airlines, airports A1, airports A2
   WHERE A1.city = 'London' AND A2.city = 'New York' AND flights.origin = A1.airport_code AND flights.destination = A2.airport_code;
 
+
 -- 2 dotazy (GROUP BY & agregacna funkcia)
+  
   -- Vypis spolocnosti podla poctu destinacii, do ktorych lietaju
   SELECT full_name, COUNT(DISTINCT A.airport_code)
   FROM flights NATURAL JOIN airlines, airports A
   WHERE flights.destination = A.airport_code
   GROUP BY full_name
   ORDER BY 2 DESC;
-
-  -- [ ]
--- ktory pasazieri maju zakupene viac ako 2 letenky?
+    
+  -- Ktory pasazieri maju zakupene viac ako 2 letenky?
   SELECT p.first_name, p.last_name, COUNT(DISTINCT t.ticket_number)
   FROM  tickets t, passengers p
   WHERE t.passenger = p.id
   GROUP BY p.first_name, p.last_name
   HAVING COUNT(DISTINCT t.ticket_number) > 2;
+
 -- 1 dotaz (EXISTS)
   
-  -- [ ]
+  -- Ktora letecka spolocnost lieta do Helsinki a New Yorku zaroven ? 
+  SELECT airlines.full_name
+  FROM airlines
+  WHERE EXISTS (
+      SELECT flight_number
+      FROM flights
+      WHERE airline = airlines.airline 
+      AND flights.destination IN ( SELECT airport_code FROM airports WHERE airports.city = 'Helsinki')
+      )
+  AND EXISTS (
+      SELECT flight_number
+      FROM flights
+      WHERE airline = airlines.airline 
+      AND flights.destination IN ( SELECT airport_code FROM airports WHERE airports.city = 'New York')
+      );
 
 
 -- 1 dotaz (predikat IN s vnorenym selectom)
   
-  -- Vypis vsetky lety Vieden->New York alebo hocijake ine mesta
+  -- Vypis vsetky lety Vieden->New York (je mozne zamenit za ine mesta)
   SELECT flights.flight_number , flights.departure_time, flights.arrival_time
   FROM flights 
   WHERE flights.origin IN (
@@ -627,20 +645,24 @@ VALUES (1, 'EK1234');
   AND flights.destination IN (
     SELECT airport_code FROM airports WHERE airports.city = 'New York'
   );
+  
 
-  -- Kolko letov lieta z Viedne ?
-  SELECT count(*)
+  -- Kolko letov lieta celkovo z Viedne ?
+  SELECT city, count(*)
   FROM flights JOIN airports ON flights.origin = airports.airport_code
-  WHERE airports.city = 'Vienna';
+  WHERE airports.city = 'Vienna'
+  GROUP BY city;
 
 
+  -- debug queries
   select *
   from flights;
 
   select *
   from airports; 
+  
   select *
-  from airlines; 
+  from airlines;
 
 
 -- =================================================================
