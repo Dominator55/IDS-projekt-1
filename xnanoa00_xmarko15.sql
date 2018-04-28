@@ -670,6 +670,54 @@ VALUES (1, 'EK1234');
 -- =================================================================
 
 
+--
+-- Permissions for the second user
+--
+GRANT ALL ON airlines       TO xmarko15;
+GRANT ALL ON airplanes      TO xmarko15;
+GRANT ALL ON airports       TO xmarko15;
+GRANT ALL ON flights        TO xmarko15;
+GRANT ALL ON customers      TO xmarko15;
+GRANT ALL ON passengers     TO xmarko15;
+GRANT ALL ON reservations   TO xmarko15;
+GRANT ALL ON tickets        TO xmarko15;
+GRANT ALL ON search_records TO xmarko15;
+
+-- execution permission on procedures
+GRANT EXECUTE ON customer_ticket_avg_cost TO xmarko15;
+
+--
+-- Materialized view
+-- 
+
+DROP MATERIALIZED VIEW passenger_ticket_view;
+
+-- ?? 
+CREATE MATERIALIZED VIEW LOG ON xmarko15.passengers WITH PRIMARY KEY, ROWID;
+CREATE MATERIALIZED VIEW LOG ON xmarko15.tickets  WITH PRIMARY KEY, ROWID;
+
+-- often used passenger-ticket pairs
+CREATE MATERIALIZED VIEW passenger_ticket_view
+  NOLOGGING
+  CACHE
+  BUILD IMMEDIATE
+  REFRESH FAST ON COMMIT
+  ENABLE QUERY REWRITE
+AS
+SELECT *
+FROM passengers NATURAL JOIN tickets;
+
+GRANT ALL ON passenger_ticket_view TO xmarko15;
+
+-- example usage:
+
+SELECT passengers.first_name, passengers.last_name
+FROM passenger_ticket_view;
+
+-- TODO: do some change
+
+SELECT passengers.first_name, passengers.last_name
+FROM passenger_ticket_view;
 -- =================================================================
 -- [ ] [5/5] Dokumentace popisující finální schéma databáze
 -- =================================================================
