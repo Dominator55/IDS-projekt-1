@@ -18,13 +18,13 @@
 */
 
 -- =================================================================
--- [x] [1/5] ERD + USE CASE
+-- [X] [1/5] ERD + USE CASE
 -- =================================================================
     -- NO SCRIPT PDF odovzdane
 
 
 -- =================================================================
--- [ ] [2/5] SQL skript pro vytvoření základních objektů schématu
+-- [X] [2/5] SQL skript pro vytvoření základních objektů schématu
 -- =================================================================
 
 /*
@@ -276,7 +276,7 @@
 
 /* ---------------------------------------
  Vypcita kolko priemerne zaplatil zakaznik s cislom id predanym v argumente za jednu letenku.
- Pokial zakazn9k nekupil ziadne letenky vyvola sa vinimka
+ Pokial zakazn9k nekupil ziadne letenky vyvola sa vynimka
  * --------------------------------------- */
 CREATE OR REPLACE PROCEDURE customer_ticket_avg_cost (id_customer_arg NUMBER) AS
    BEGIN
@@ -565,7 +565,7 @@ INSERT INTO search_records (customer, flight)
 VALUES (1, 'EK1234');
 
 -- =================================================================
--- [ ] [3/5] SQL skript s několika dotazy SELECT
+-- [X] [3/5] SQL skript s několika dotazy SELECT
 -- =================================================================
 
 /*
@@ -653,7 +653,6 @@ VALUES (1, 'EK1234');
   WHERE airports.city = 'Vienna'
   GROUP BY city;
 
-
   -- debug queries
   select *
   from flights;
@@ -669,6 +668,32 @@ VALUES (1, 'EK1234');
 -- [ ] [4/5] SQL skript pro vytvoření pokročilých objektů schématu
 -- =================================================================
 
+
+-- Explain plan, to see the difference between searching against tables without INDEX
+-- and with an INDEX. Should be used for frequently used tables.
+
+-- first run
+EXPLAIN PLAN 
+FOR SELECT first_name, last_name, flight, seat_number, seat_class
+FROM passengers NATURAL JOIN tickets;
+
+SELECT * FROM TABLE(DBMS_XPLAN.display);
+
+-- now create an INDEX
+CREATE INDEX passenger_index ON passengers (id, first_name, last_name);
+
+-- second run
+EXPLAIN PLAN 
+FOR SELECT first_name, last_name, flight, seat_number, seat_class
+FROM passengers NATURAL JOIN tickets;
+
+SELECT * FROM TABLE(DBMS_XPLAN.display);
+
+DROP INDEX passenger_index;
+
+
+-- example procedure execution
+EXEC customer_ticket_avg_cost(97057912356);
 
 --
 -- Permissions for the second user (as Booking Agent, explained in documentation)
@@ -689,12 +714,11 @@ GRANT EXECUTE ON customer_ticket_avg_cost TO xmarko15;
 --
 -- Materialized view
 -- 
-
 DROP MATERIALIZED VIEW passenger_ticket_view;
 
--- ?? 
-CREATE MATERIALIZED VIEW LOG ON xmarko15.passengers WITH PRIMARY KEY, ROWID;
-CREATE MATERIALIZED VIEW LOG ON xmarko15.tickets  WITH PRIMARY KEY, ROWID;
+-- to enable fast refresh
+CREATE MATERIALIZED VIEW LOG ON tickets WITH PRIMARY KEY, ROWID;
+CREATE MATERIALIZED VIEW LOG ON passengers WITH PRIMARY KEY, ROWID;
 
 -- often used passenger-ticket pairs
 CREATE MATERIALIZED VIEW passenger_ticket_view
@@ -704,20 +728,26 @@ CREATE MATERIALIZED VIEW passenger_ticket_view
   REFRESH FAST ON COMMIT
   ENABLE QUERY REWRITE
 AS
-SELECT *
-FROM passengers NATURAL JOIN tickets;
+SELECT passengers.rowid AS passenger_rid, tickets.rowid AS ticket_rid,
+first_name, last_name, flight, seat_number, seat_class, cost
+FROM passengers JOIN tickets ON passengers.id = tickets.passenger;
 
 GRANT ALL ON passenger_ticket_view TO xmarko15;
 
 -- example usage:
 
-SELECT passengers.first_name, passengers.last_name
+SELECT first_name, last_name, flight, seat_number, seat_class, cost
 FROM passenger_ticket_view;
 
--- TODO: do some change
+INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
+VALUES ('022-0231079259', 139, 4, 9802261040, 'LH1724', '01A', 'F');
 
-SELECT passengers.first_name, passengers.last_name
+COMMIT;
+
+SELECT first_name, last_name, flight, seat_number, seat_class, cost
 FROM passenger_ticket_view;
+
+
 -- =================================================================
 -- [ ] [5/5] Dokumentace popisující finální schéma databáze
 -- =================================================================
