@@ -274,12 +274,16 @@
     END;
   /
 
+
+SET serveroutput ON;
 /* ---------------------------------------
  Vypcita kolko priemerne zaplatil zakaznik s cislom id predanym v argumente za jednu letenku.
- Pokial zakazn9k nekupil ziadne letenky vyvola sa vynimka
+ Pokial zakazn9k nekupil ziadne letenky vyvola sa vynimka, informacie o tom, kto plati 
+ letenky su ulozene v tabulke reservations, zakaznik moze zaplatit rezervaciu, ktora obsahuje
+ viacere letenky aj pre ine osoby
  * --------------------------------------- */
 CREATE OR REPLACE PROCEDURE customer_ticket_avg_cost (id_customer_arg NUMBER) AS
-   BEGIN
+  BEGIN
     DECLARE CURSOR cursor_cost is
     SELECT C.id, C.first_name, C.last_name, T.cost
     FROM  customers C,  reservations R, tickets T
@@ -303,14 +307,52 @@ CREATE OR REPLACE PROCEDURE customer_ticket_avg_cost (id_customer_arg NUMBER) AS
 				END LOOP;
 				CLOSE cursor_cost;
 				avg_cost := total_cost / num_tickets;
-				DBMS_OUTPUT.put_line('Klient ' || first_name || ' avg_cost ' || avg_cost);
+				DBMS_OUTPUT.put_line('Customer ' || id_customer || ' name : ' || first_name || ' ' || last_name || ' avg_cost : ' || avg_cost);
 				EXCEPTION WHEN ZERO_DIVIDE THEN
 					BEGIN
-					DBMS_OUTPUT.put_line('Klient s ID: ' || id_customer_arg || ' nema v databazi zadne rezervace.');
+					DBMS_OUTPUT.put_line('Customer with ID: ' || id_customer_arg || ' does not have reservation in database.');
 				END;
 			END;
 	END;
 /
+
+/* ------------------------------------
+ Vypocita koloko percent vsetkych lietadiel vlastni letecka spolocnost s id airline_id_arg.
+ Pokial databaza neobsahuje ziadne lietadlo vyvola sa vynimka
+* ------------------------------------- */
+CREATE OR REPLACE PROCEDURE airline_plane_percentage (airline_id_arg IN VARCHAR) AS
+  BEGIN
+    DECLARE CURSOR cursor_planes is
+    SELECT P.airline, P.id
+    FROM  airplanes P;
+			id_airline airplanes.airline%TYPE;
+      id_plane airplanes.id%TYPE;
+			num_planes NUMBER;
+      num_all_planes NUMBER;
+      plane_percentage NUMBER;
+			BEGIN
+        num_all_planes := 0;
+				num_planes := 0;
+				OPEN cursor_planes;
+				LOOP
+					FETCH cursor_planes INTO id_airline, id_plane;
+					EXIT WHEN cursor_planes%NOTFOUND;
+          if id_airline = airline_id_arg THEN
+            num_planes := num_planes + 1;
+          END IF;
+          num_all_planes := num_all_planes + 1;
+				END LOOP;
+				CLOSE cursor_planes;
+				plane_percentage := (num_planes / num_all_planes) * 100;
+				DBMS_OUTPUT.put_line('Airline ' || airline_id_arg || ' owns : ' || plane_percentage || ' % of all planes in database');
+				EXCEPTION WHEN ZERO_DIVIDE THEN
+					BEGIN
+					DBMS_OUTPUT.put_line('Database does not contain planes owned by airline : ' || airline_id_arg);
+				END;
+			END;
+  END;
+/
+
 /* ---------------------
   INSERT SAMPLE DATA 
 ---------------------- */
@@ -406,9 +448,6 @@ INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats
 VALUES ('Airbus', 'A330-200', '0', '22', '228', 'TK');
 
 INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
-VALUES ('Airbus', 'A319', '0', '12', '100', 'BA');
-
-INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
 VALUES ('Airbus', 'A330-300', '8', '42', '145', 'LH');
 
 INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
@@ -422,10 +461,10 @@ INSERT INTO passengers (id, first_name, last_name)
 VALUES (9812345678, 'Peter', 'Marko');
 
 INSERT INTO passengers (id, first_name, last_name)
-VALUES (9905291235, 'Meno', 'Priezvisko');
+VALUES (9905291235, 'Sherwin', 'Hsu');
 
 INSERT INTO passengers (id, first_name, last_name)
-VALUES (9805291244, 'Meno', 'Priezvisko');
+VALUES (9805291244, 'Ifor', 'Smoak');
 
 INSERT INTO passengers (id, first_name, last_name)
 VALUES (9805291245, 'Meno', 'Priezvisko');
@@ -528,6 +567,12 @@ VALUES ('1', TIMESTAMP '2018-02-01 23:42:12.00', '3');
 INSERT INTO reservations (payment_status, created_at, created_by)
 VALUES ('0', TIMESTAMP '2018-05-01 23:42:12.00', '4');
 
+INSERT INTO reservations (payment_status, created_at, created_by)
+VALUES ('1', TIMESTAMP '2018-05-01 00:42:12.00', '4');
+
+INSERT INTO reservations (payment_status, created_at, created_by)
+VALUES ('1', TIMESTAMP '2018-05-03 5:42:12.00', '5');
+
 
 
 -- insert tickets
@@ -541,16 +586,22 @@ INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_n
 VALUES ('011-1251077229', 142, 4, 97057912356, 'LH1724', '01B', 'B');
 
 INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
-VALUES ('021-1251077233', 142, 4, 97057912356, 'LH1725', '01B', 'B');
+VALUES ('021-1251077233', 142, 6, 97057912356, 'LH1725', '01B', 'B');
 
 INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
-VALUES ('021-1251077257', 172, 4, 97057912356, 'LI1725', '01C', 'B');
+VALUES ('021-1251077257', 172, 6, 97057912356, 'LI1725', '01C', 'B');
 
 INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
-VALUES ('021-1251077242', 112, 4, 9802261040, 'AZ2275', '01D', 'E');
+VALUES ('021-1251077242', 112, 5, 9802261040, 'AZ2275', '01D', 'E');
 
 INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
-VALUES ('021-1251077299', 512, 4, 9802261040, 'AA0001', '05D', 'E');
+VALUES ('021-1251077299', 512, 5, 9802261040, 'AA0001', '05D', 'E');
+
+INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
+VALUES ('021-1251077429', 512, 2, 9905291235, 'AA0001', '05D', 'E');
+
+INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
+VALUES ('021-1251022299', 512, 4, 9805291244, 'AA0001', '05D', 'E');
 
 
 
@@ -668,7 +719,6 @@ VALUES (1, 'EK1234');
 -- [ ] [4/5] SQL skript pro vytvoření pokročilých objektů schématu
 -- =================================================================
 
-
 -- Explain plan, to see the difference between searching against tables without INDEX
 -- and with an INDEX. Should be used for frequently used tables.
 
@@ -693,7 +743,12 @@ DROP INDEX passenger_index;
 
 
 -- example procedure execution
-EXEC customer_ticket_avg_cost(97057912356);
+EXEC customer_ticket_avg_cost(2);
+EXEC customer_ticket_avg_cost(4);
+EXEC customer_ticket_avg_cost(5);
+EXEC airline_plane_percentage('AA');
+EXEC airline_plane_percentage('EK');
+EXEC airline_plane_percentage('AY');
 
 --
 -- Permissions for the second user (as Booking Agent, explained in documentation)
