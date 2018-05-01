@@ -437,7 +437,7 @@ INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats
 VALUES ('Airbus', 'A330-200', '0', '20', '224', 'AA');
 
 INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
-VALUES ('Boeing', '767-300', '0', '28', '160', 'AA');
+VALUES ('Boeing', '767-300', '0', '28', '160', 'AY');
 
 INSERT INTO airplanes (producer, model, fclass_seats, bclass_seats, eclass_seats, airline)
 VALUES ('Boeing', '767-300', '0', '28', '160', 'AA');
@@ -526,13 +526,13 @@ INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airl
 VALUES ('AA0003', TIMESTAMP '2018-05-21 8:30:00.00 +00:00', TIMESTAMP '2018-05-21 12:10:00.00 -04:00', 7, 'AY', 'LHR', 'JFK');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('LH1724', TIMESTAMP'2018-05-20 06:15:00.00 +01:00', TIMESTAMP '2018-05-20 07:55:00.00 +01:00', 10, 'LH', 'FRA', 'TXL');
+VALUES ('LH1724', TIMESTAMP'2018-05-20 06:15:00.00 +01:00', TIMESTAMP '2018-05-20 07:55:00.00 +01:00', 9, 'LH', 'FRA', 'TXL');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('LH1725', TIMESTAMP'2018-05-27 06:15:00.00 +01:00', TIMESTAMP '2018-05-27 07:55:00.00 +01:00', 10, 'LH', 'FRA', 'TXL');
+VALUES ('LH1725', TIMESTAMP'2018-05-27 06:15:00.00 +01:00', TIMESTAMP '2018-05-27 07:55:00.00 +01:00', 9, 'LH', 'FRA', 'TXL');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('OS0089', TIMESTAMP'2018-05-25 10:15:00.00 +01:00', TIMESTAMP '2018-05-25 13:50:00.00 -04:00', 11, 'OS', 'VIE', 'JFK');
+VALUES ('OS0089', TIMESTAMP'2018-05-25 10:15:00.00 +01:00', TIMESTAMP '2018-05-25 13:50:00.00 -04:00', 10, 'OS', 'VIE', 'JFK');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
 VALUES ('LH1235', TIMESTAMP'2018-05-25 11:10:00.00 +01:00', TIMESTAMP '2018-05-25 15:45:00.00 -04:00', 7, 'LH', 'VIE', 'JFK');
@@ -541,10 +541,10 @@ INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airl
 VALUES ('AZ2275', TIMESTAMP'2018-05-30 8:00:00.00 +00:00', TIMESTAMP '2018-05-30 10:15:00.00 +01:00', 2, 'BA', 'LGW', 'VIE');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('AB3275', TIMESTAMP'2018-05-04 08:00:00.00 +02:00', TIMESTAMP '2018-05-04 08:45:00.00 +00:00', 11, 'AY', 'HEL', 'LGW');
+VALUES ('AB3275', TIMESTAMP'2018-05-04 08:00:00.00 +02:00', TIMESTAMP '2018-05-04 08:45:00.00 +00:00', 5, 'AY', 'HEL', 'LGW');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
-VALUES ('AC1275', TIMESTAMP'2018-05-05 18:00:00.00 +00:00', TIMESTAMP '2018-05-05 22:50:00.00 +02:00', 11, 'AY', 'LGW', 'HEL');
+VALUES ('AC1275', TIMESTAMP'2018-05-05 18:00:00.00 +00:00', TIMESTAMP '2018-05-05 22:50:00.00 +02:00', 5, 'AY', 'LGW', 'HEL');
 
 INSERT INTO flights (flight_number, departure_time, arrival_time, airplane, airline, origin, destination)
 VALUES ('BZ1275', TIMESTAMP'2018-05-25 04:10:00.00 +00:00', TIMESTAMP '2018-05-25 06:45:00.00 +01:00', 6, 'LH', 'LHR', 'FRA');
@@ -634,14 +634,14 @@ VALUES (1, 'EK1234');
 -- 2 dotazy (JOIN 2 tables)
 
 -- Ktore lety su prevadzakovane British Airways
-    SELECT *
-    from flights NATURAL JOIN airlines
-    WHERE  full_name = 'British Airways';
+  SELECT *
+  from flights NATURAL JOIN airlines
+  WHERE  full_name = 'British Airways';
     
 -- Ake typy lietadiel vlastni American Airlines
-    SELECT DISTINCT producer, model
-    from airlines NATURAL JOIN airplanes
-    WHERE  full_name = 'American Airlines';
+  SELECT DISTINCT producer, model
+  from airlines NATURAL JOIN airplanes
+  WHERE  full_name = 'American Airlines';
     
 -- 1 dotaz (JOIN 3 tables)
 
@@ -717,31 +717,47 @@ VALUES (1, 'EK1234');
 
 
 -- =================================================================
--- [ ] [4/5] SQL skript pro vytvoření pokročilých objektů schématu
+-- [X] [4/5] SQL skript pro vytvoření pokročilých objektů schématu
 -- =================================================================
 
 -- Explain plan, to see the difference between searching against tables without INDEX
 -- and with an INDEX. Should be used for frequently used tables.
 
+
 -- first run
-EXPLAIN PLAN 
-FOR SELECT first_name, last_name, flight, seat_number, seat_class
-FROM passengers NATURAL JOIN tickets;
+-- Display information for every passenger for every reservation, including number of flights and total cost for the passenger
+EXPLAIN PLAN FOR 
+SELECT reservation, first_name, last_name, COUNT(*) AS num_of_flights, SUM(cost) AS cost_all
+FROM passengers, tickets
+WHERE passengers.id = tickets.passenger
+GROUP BY reservation, first_name, last_name;
 
-SELECT * FROM TABLE(DBMS_XPLAN.display);
+-- OUTPUT 
+SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY());
 
--- now create an INDEX
-CREATE INDEX passenger_index ON passengers (id, first_name, last_name);
+-- create an INDEX
+--CREATE INDEX passenger_index ON passengers (id, first_name, last_name); -- additional index 
+CREATE INDEX ticket_index ON tickets (passenger, reservation, cost);
+-- 
 
 -- second run
-EXPLAIN PLAN 
-FOR SELECT first_name, last_name, flight, seat_number, seat_class
-FROM passengers NATURAL JOIN tickets;
+EXPLAIN PLAN FOR 
+SELECT reservation, first_name, last_name, COUNT(*) AS num_of_flights, SUM(cost) AS cost_all
+FROM passengers, tickets
+WHERE passengers.id = tickets.passenger
+GROUP BY reservation, first_name, last_name;
 
-SELECT * FROM TABLE(DBMS_XPLAN.display);
+-- OUTPUT 
+SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY());
 
-DROP INDEX passenger_index;
+-- the actual query output, only for DEBUG
+-- SELECT reservation, first_name, last_name, COUNT(*) AS num_of_flights, SUM(cost) AS cost_all
+-- FROM passengers, tickets
+-- WHERE passengers.id = tickets.passenger
+-- GROUP BY reservation, first_name, last_name;
 
+DROP INDEX ticket_index;
+--DROP INDEX passenger_index;
 
 -- example procedure execution
 EXEC customer_ticket_avg_cost(2);
@@ -766,18 +782,19 @@ GRANT ALL ON search_records TO xmarko15;
 
 -- execution permission on procedures
 GRANT EXECUTE ON customer_ticket_avg_cost TO xmarko15;
+GRANT EXECUTE ON airline_plane_percentage TO xmarko15;
 
 --
 -- Materialized view
 -- 
-DROP MATERIALIZED VIEW passenger_ticket_view;
+DROP MATERIALIZED VIEW passenger_ticket_summary;
 
--- to enable fast refresh
+-- log changes to these tables
 CREATE MATERIALIZED VIEW LOG ON tickets WITH PRIMARY KEY, ROWID;
 CREATE MATERIALIZED VIEW LOG ON passengers WITH PRIMARY KEY, ROWID;
 
 -- often used passenger-ticket pairs
-CREATE MATERIALIZED VIEW passenger_ticket_view
+CREATE MATERIALIZED VIEW passenger_ticket_summary
   NOLOGGING
   CACHE
   BUILD IMMEDIATE
@@ -788,12 +805,12 @@ SELECT passengers.rowid AS passenger_rid, tickets.rowid AS ticket_rid,
 first_name, last_name, flight, seat_number, seat_class, cost
 FROM passengers JOIN tickets ON passengers.id = tickets.passenger;
 
-GRANT ALL ON passenger_ticket_view TO xmarko15;
+GRANT ALL ON passenger_ticket_summary TO xmarko15;
 
 -- example usage:
 
 SELECT first_name, last_name, flight, seat_number, seat_class, cost
-FROM passenger_ticket_view;
+FROM passenger_ticket_summary;
 
 INSERT INTO tickets (ticket_number, cost, reservation, passenger, flight, seat_number, seat_class)
 VALUES ('022-0231079259', 139, 4, 9802261040, 'LH1724', '01A', 'F');
@@ -801,9 +818,20 @@ VALUES ('022-0231079259', 139, 4, 9802261040, 'LH1724', '01A', 'F');
 COMMIT;
 
 SELECT first_name, last_name, flight, seat_number, seat_class, cost
-FROM passenger_ticket_view;
+FROM passenger_ticket_summary;
+
+DELETE FROM tickets WHERE ticket_number = '022-0231079259';
+
+SELECT first_name, last_name, flight, seat_number, seat_class, cost
+FROM passenger_ticket_summary;
+
+-- commit to apply the last DELETE statement
+COMMIT;
+
+SELECT first_name, last_name, flight, seat_number, seat_class, cost
+FROM passenger_ticket_summary;
 
 
 -- =================================================================
--- [ ] [5/5] Dokumentace popisující finální schéma databáze
+-- [X] [5/5] Dokumentace popisující finální schéma databáze
 -- =================================================================
