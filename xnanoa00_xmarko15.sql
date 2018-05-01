@@ -278,7 +278,8 @@
 SET serveroutput ON;
 /* ---------------------------------------
  Vypcita kolko priemerne zaplatil zakaznik s cislom id predanym v argumente za jednu letenku.
- Pokial zakazn9k nekupil ziadne letenky vyvola sa vynimka, informacie o tom, kto plati 
+ Pokiaľ zákazník nemá rezerváciu, alebo rezervácia neobsahuje žiadne letenky, tak sa volá výnimka,
+ informacie o tom, kto plati 
  letenky su ulozene v tabulke reservations, zakaznik moze zaplatit rezervaciu, ktora obsahuje
  viacere letenky aj pre ine osoby
  * --------------------------------------- */
@@ -347,7 +348,7 @@ CREATE OR REPLACE PROCEDURE airline_plane_percentage (airline_id_arg IN VARCHAR)
 				DBMS_OUTPUT.put_line('Airline ' || airline_id_arg || ' owns : ' || plane_percentage || ' % of all planes in database');
 				EXCEPTION WHEN ZERO_DIVIDE THEN
 					BEGIN
-					DBMS_OUTPUT.put_line('Database does not contain planes owned by airline : ' || airline_id_arg);
+					DBMS_OUTPUT.put_line('Airplane database is empty!' );
 				END;
 			END;
   END;
